@@ -1,0 +1,174 @@
+---
+title: "Bellabeat Case Study: Google Data Analytics Capstone"
+author: "Hannah Joseph"
+date: "2024-08-27"
+output: html_document
+---
+
+# Introduction
+
+Welcome to my case study! In this project, I will be using my data analytics skills, provided by Google Data Analytics Certificate program, to create visualization and gain insights on a health-focused application known as Bellabeat. I will be using R programming throughout this process, and following the data analysis process: Ask, Prepare, Process, Analyze, Share, and Act.
+
+# About Bellabeat
+
+Bellabeat, a pioneering high-tech company founded in 2013 by Chief Creative Officer Urška Sršen and mathematician Sando Mur, is dedicated to creating health-focused products. The company's mission is to design elegant and innovative technology that empowers women worldwide. By collecting data on activity, sleep, stress, and reproductive health, Bellabeat provides women with valuable insights into their well-being. This approach has fueled Bellabeat's rapid growth and established it as a leading tech-driven wellness company for women.
+
+## Scenario
+
+With this empowering approach, I will be analyzing Bellabeat application's user usage to gain insights into how consumers utilize non-Bellabeat smart devices. With this, I will be using [FitBit Fitness Tracker Data](https://www.kaggle.com/datasets/arashnic/fitbit/code), provided by Mobius, to accomplish this goal.
+
+# Ask
+
+The main goal of this project is to gain insights about smart device usage and how consumers use non-Bellabeat products. Some of the questions that will be asked:
+
+1.  What are some trends in smart device usage?
+2.  How could these trends be applied to Bellabeat customers?
+3.  How could these trends help influence Bellabeat marketing strategy?
+
+With these questions, it allows me to accomplish the goal of improving Bellabeat's products and targeting their marketing efforts to their customers. Additionally, I'll need to generate recommendations to stakeholders, which are Urška Sršen and Sando Mur.
+
+# Prepare
+
+To answer the following questions, I will gather data that will support my analysis. Using [FitBit Fitness Tracker Data](https://www.kaggle.com/datasets/arashnic/fitbit/code) (CC0: Public Domain, dataset made available through Mobius), it will allow me to gain insights on smart device usage. This Kaggle dataset contains personal fitness tracker from thirty-five FitBit users. The users consented to the submission of personal tracker data, which includes: minute-level output for physical activity, heart rate, and sleep monitoring. It also includes information about: daily activity, steps, and heart rate.
+
+```{r packages required, include = FALSE, echo = FALSE}
+
+library(tidyverse) #for data wrangling
+library(here)
+
+#unloadNamespace("here")
+```
+
+I will look at Daily Activity and compare it to Sleep data.
+
+```{r daily activity vs. sleep data, echo = FALSE, include = FALSE}
+
+#reading daily activity and sleep data:
+activity <- read.csv(here("dailyActivity_merged.csv"))
+sleep <- read.csv(here("sleepDay_merged.csv"))
+
+```
+
+# Process
+
+I will then observe and identify all columns within the daily activity and sleep data.
+
+```{r columns of sleep data and daily activity, echo = FALSE}
+
+head(activity)
+colnames(activity)
+
+#merging sleep data with daily activity
+
+unique(activity$Id) #more individuals than sleep data
+unique(sleep$Id)
+
+sleep_and_activity <- activity |> 
+  left_join(sleep, by = "Id")
+```
+
+There are `r n_distinct(activity)` observations for daily activity, while `r n_distinct(sleep)` observations for sleep data.
+
+Now that I have my data separated, organized, and combined in specific data frames, I need to have a better understanding of my data and a quick overview of the data that I was working with. In order to complete this step, I proceeded to use various R functions for each specific data frame.
+
+# Analyze
+
+```{r summary of data, echo=FALSE, include=FALSE}
+# Summary statistics for each data frame
+
+sleep_and_activity %>% # this explains the summary of daily_activity data
+select(TotalSteps,
+TotalDistance,
+SedentaryMinutes) %>%
+summary()
+
+sleep_and_activity %>%
+select(TotalSleepRecords,
+TotalMinutesAsleep,
+TotalTimeInBed) %>%
+summary()
+
+```
+
+Key Findings:
+
+-   The sedentary time was higher than the daily activity times for most participants
+
+-   Most participants slept for about 7 hours
+
+-   The average steps tracked is about 7485 steps
+
+## Data Visualizations
+
+```{r visualizations, echo = FALSE, include=FALSE}
+ggplot(
+  data=daily_activity, 
+  aes(x=TotalSteps, y=SedentaryMinutes)) + 
+  geom_point() +
+  geom_smooth()+
+  labs(
+    title = "Total Steps vs. Sedentary",
+    x = "Total Steps Taken in a Day",
+    y = "Sedentary Minutes"
+  )
+```
+
+The graph shows a negative relationship between the total sleep and the sedentary minutes of the participants.The more time the participants spent sitting down or not moving, the less time they spend walking and getting their steps in.
+
+This data reveals that Bellabeat should find a way to encourage their consumers to stand up and move more often.
+
+Additionally, I explored the relationship between minutes spent asleep versus time spent in bed:
+
+```{r sleep vs in bed, echo=FALSE, include=FALSE}
+ggplot(
+  data=sleep, 
+  aes(x=TotalMinutesAsleep, 
+      y=TotalTimeInBed)) + 
+  geom_point()+
+  geom_smooth()+
+  labs(
+    title = "Total Minutes Asleep vs. Total Time in Bed",
+    x = "Total Minutes Asleep",
+    y = "Total Time in Bed"
+  )
+  
+```
+
+This shows a positive correlation between participants spent in bed versus the total minutes asleep. This shows that Bellabeat's products such as Leaf and Time should be able to track the total time spent sleeping for the participants. The data should be accurate to what is being represented.
+
+Lastly, I want to visualize the total steps versus calories.
+
+```{r total steps vs calories, echo=FALSE, include=FALSE}
+ggplot(
+  data= activity, 
+  aes(x=TotalSteps, y=Calories)) + 
+  geom_point() + 
+  geom_smooth() + 
+  labs(
+    title="Total Steps vs. Calories",
+    x = "Total Steps Taken",
+    y = "Calories"
+    )
+```
+
+A positive correlation is shown as the more steps are taken, the more calories are burned.
+
+# Share
+
+## Recommendations based on my analysis
+
+### Target Audience 
+
+Bellabeat marketing team should aim to reach the people that are currently working in sedentary office environments. These are the type of people that can be benefit from using Bellabeat.
+
+The Bellabeat app can help users develop better habits and become more active throughout their daily lives. Bellabeat can gather information that can help create daily routines for a each individual, and recommend healthy choices.
+
+### Recommendations 
+
+Overall, after analyzing the FitBit data, I gained insights that could improve Bellabeat's products and marketing strategy. The main important finding is that the sedentary time for each participants was higher than the daily activity time. The average time was higher than 16 hours. This finding can help improve the company's app by creating a strategy where the app can send notifications to their users, encouraging them to be more active if the user is sedentary for a long period of time.
+
+Another finding is that the average sleep time for the participants was about 7 hours. In addition to the notifications to alert users for being sedentary for long, the Bellabeat marketing team can also use the app to improve users sleeping periods. The app can send reminders to the users notifying them a recommended time to go to sleep.
+
+The last finding that could benefit Bellabeat and improve the marketing strategy could be to encourage users through the app to take the recommended 10,000 steps. As show in the the average steps from the participants is about 7638 step a day which is less than the recommended steps.
+
+In conclusion, the analysis of FitBit's data allowed me to make proper and educated recommendations for the marketing team and the stakeholders. With this, Bellabeat can significantly improve their products, and provide a quality and beneficial resources to empower women.
